@@ -1,22 +1,20 @@
 import pandas as pd
 
-class Report:
-    def __init__(self, df, response_column, issuing_bank, source):
+class alfredo:
+    def __init__(self, df, response_column, issuing_bank):
         self.df = df
         self.response_column = response_column
         self.issuing_bank = issuing_bank
-        self.source = source
-    
+       
     def summarize(self):
         """
         Gives a brief report with top 5 responses (auth rate etc),
         issuer with most transactions and top 5 issuers with higher decline rate.
         """
-        upper = self.source.upper()
-
-        if upper == 'TD':
+        
+        if self.response_column == 'nrmlzd_response':
             not_approved = self.df[self.df[self.response_column] != "APPROVED"]
-        elif upper == 'LP':
+        elif self.response_column == 'Processor Response Text':
             not_approved = self.df[self.df[self.response_column] != "Approved"]
         else:
             raise ValueError("Invalid source value.")
@@ -44,12 +42,6 @@ class Report:
             raise ValueError("Invalid response column value.")
         return improvement
 
-class Crosstab:
-    def __init__(self, df, col1, col2):
-        self.df = df
-        self.col1 = col1
-        self.col2 = col2
-        
     def crosstab(self):
         """
         Crosses two columns inside a dataframe.
@@ -58,33 +50,12 @@ class Crosstab:
         print(result)
 
 
-## use:
-# report = Report(df, 'nrmlzd_response', 'Issuing Bank', 'TD')
-# report.summarize()
-
-## use:
-# crosstab = Crosstab(df, 'col1', 'col2')
-# crosstab.crosstab()
-
-class TransactionAnalyzer:
-    """Analyzes transaction data."""
-
-    def __init__(self, df):
-        """Initializes the TransactionAnalyzer with a DataFrame.
-
-        Args:
-            df (pd.DataFrame): The transaction data.
-        """
-        self.df = df
-
     def specific_approval(self, response_column, filter_by, sub_filter=None):
         """Returns the approval rate for specific parameters.
-
         Args:
             response_column (str): The column used to calculate the approval rate, which should contain the values "Approved" or "Declined".
             filter_by (str): The parameter/column to be analyzed, e.g. "acquirer".
             sub_filter (str, optional): A special parameter/category to be analyzed, e.g. "CILO", or None if you just want the general approval rate for a column. Defaults to None.
-
         Returns:
             pd.DataFrame: A cross tabulation of approval rates by parameter/category.
         """
@@ -98,7 +69,6 @@ class TransactionAnalyzer:
 
     def dedup(self):
         """Removes duplicate rows based on specified columns.
-
         Returns:
             pd.DataFrame: The dataframe with duplicate rows removed.
         """
@@ -107,11 +77,9 @@ class TransactionAnalyzer:
 
     def share(self, filter_by, sub_filter=None):
         """Returns the share that x represents in the operation.
-
         Args:
             filter_by (str): The parameter to filter the possible improvement by, e.g. "Issuing Bank".
-            sub_filter (str, optional): A filter inside the filter_by, e.g. "NU PAGAMENTOS S.A.", or None for no sub filter. Defaults to None.
-
+            sub_filter (str, optional): A filter inside the filter_by, e.g. "NU PAGAMENTOS SA", or None for no sub filter. Defaults to None.
         Returns:
             pd.Series: The share represented by x.
         """
@@ -124,4 +92,6 @@ class TransactionAnalyzer:
                 share = share[sub_filter]
             except KeyError:
                 raise ValueError(f"{sub_filter} not found in {filter_by}")
-            return share
+            return share       
+
+
